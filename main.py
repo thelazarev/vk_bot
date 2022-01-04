@@ -54,7 +54,7 @@ def split_video(video_path: str, part_len=14) -> List[str]:
     return ret
 
 
-def delete_tt_video(tt_videos):
+def delete_split_tt_videos(tt_videos):
     for video in tt_videos:
         try:
             os.remove(video)
@@ -76,6 +76,7 @@ def post_tt_video(event: VkBotMessageEvent, message):
         tt_video = uploader.story(tt_videos[0], 'video', group_id=GROUP_ID)
     except Exception as e:
         logging.error("can't upload story\n")
+        delete_split_tt_videos(tt_videos)
         return e
 
     data = tt_video.json()
@@ -87,7 +88,7 @@ def post_tt_video(event: VkBotMessageEvent, message):
                          random_id=get_random_id())
     except Exception as e:
         logging.error("can't send vk message\n")
-        delete_tt_video(tt_video)
+        delete_split_tt_videos(tt_videos)
         return e
 
     for video in tt_videos[1:]:
@@ -96,8 +97,10 @@ def post_tt_video(event: VkBotMessageEvent, message):
             uploader.story(video, 'video', group_id=GROUP_ID)
         except Exception as e:
             logging.error("can't upload story\n")
-            delete_tt_video(tt_video)
+            delete_split_tt_videos(tt_videos)
             return e
+
+    delete_split_tt_videos(tt_videos)
 
 
 def renew_vk_logpoll():
@@ -125,7 +128,7 @@ if __name__ == "__main__":
     GROUP_ID = int(os.getenv("GROUP_ID"))
     BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-    TIKTOK_URLS = ['https://vm.tiktok.com', 'https://www.tiktok.com']
+    TIKTOK_URLS = ['https://vm.tiktok.com', 'https://www.tiktok.com', 'https://m.tiktok.com']
     users = {}
 
     tt_session = requests.sessions.Session()

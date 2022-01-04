@@ -25,12 +25,12 @@ def download_data(uri):
 
 def video_url_parse(tt_page_content):
     download_address = re.compile('downloadAddr":"(.*)","shareCover')
-    return download_address.search(str(tt_page_content.data)).group(1)
+    return download_address.search(tt_page_content.data.decode('unicode-escape')).group(1)
 
 
 def download_tt_video(url, name):
     tt_page_content = download_data(url)
-    tt_video_link = video_url_parse(tt_page_content)
+    tt_video_link = video_url_parse(tt_page_content)    
     tt_video = download_data(tt_video_link)
 
     tmp_directory = f'{Path(__file__).resolve().parent.parent}/tmp'
